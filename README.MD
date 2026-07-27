@@ -4,7 +4,7 @@ A one-page studio site built from a simulated client brief, practicing what a re
 
 **"Adel & Co. Ceramics" is not a real business.** The brief (included as [BRIEF.md](./BRIEF.md)) was written to imitate one — right down to placeholder contact info — so this repo is practice, not client work, and it's presented as exactly that. First in a series of client-brief practice projects.
 
-**Live demo:** _link goes here once deployed to GitHub Pages_
+**Live demo:** https://tesidrah.github.io/client-brief-01-ceramics-studio/
 
 ## What this is
 
