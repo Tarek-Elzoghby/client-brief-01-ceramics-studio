@@ -1,0 +1,75 @@
+Adel & Co. Ceramics — Build Log
+
+Project kickoff
+I started with a client project — Marwa Adel, a potter in Cairo who needed a simple one-page site to replace managing commissions through Instagram DMs. No technical background on her end, no existing brand — just an Instagram feed and a clear feeling in mind: "not like a SaaS startup page."
+
+Style direction
+Before touching any code, my design partner and I worked out a visual direction first. We landed on "Clay Light" — warm, slightly imperfect, more like walking into a real studio than opening an app. The reasoning: over-polished SaaS precision (perfect grids, cold sans fonts, blue gradients) actually undermines trust for something as personal as commissioning handmade pottery. Warm and human is the credibility signal here, not slickness.
+
+Typography
+Fraunces for display (soft, low-contrast, slightly hand-drawn letterforms) paired with Karla for body — deliberately not Inter, since that's the fastest way back to "generic SaaS."
+
+Color
+Locked a palette built entirely from warm clay/beige tones with terracotta (
+#B5603F) as the single accent — chosen because it's literally the color of fired clay, so it doubles as the brand color and the material reference at once. No blue, no white, no black anywhere in the system.
+
+Spacing
+8px base unit, generous section padding (64–128px) to make the scroll feel like moving room to room in a studio rather than a scroll-jacked landing page.
+
+Nav vs. scroll indicator
+Decided against a nav bar — one page, one path, and nav bars read as "Website" in a way that fights the Clay Light feeling. Went with a quiet scroll indicator instead, built as a real anchor link so it stays accessible, not just decorative.
+
+Scroll indicator — nav vs. header vs. hero
+I realized the scroll indicator was the only thing that would've lived in <header>, and it felt wrong sitting there almost empty — but it also didn't belong loose in <main> since it wasn't tied to any section. Worked through the semantics with my design partner: a <header> is for introductory content, and a scroll cue isn't introducing anything, it's pointing at what's next. The fix was realizing it wasn't its own structural unit at all — it's part of the hero's job. So it lives inside the hero section, right after the tagline.
+
+Scroll indicator — implementation mismatch
+When I brought back my HTML, I'd actually built a <progress> scroll-bar instead of the anchor-link chevron we'd planned. Good catch on the review — a progress bar tracks page-scroll position (needs JS, usually pinned full-width at the top) which is a completely different feature from a "there's more below, tap here" cue. Went back to the plan: <a href="#about"> inside the hero.
+
+Hero layout
+Full-viewport hero, flex column, centered content. Tight spacing between the h1 and tagline (read as one thought), then isolated space before the scroll indicator at the bottom — using justify-content: space-between to get that shape automatically.
+
+space-between vs. space-around
+I asked why not space-around to keep things off the edges. Learned that both are about distributing leftover space between/around children, not fixed edge distance — space-around even gives half-size gaps at the edges vs. between items, which isn't intuitive. Padding is the right tool for guaranteed edge distance since it's a fixed value from the spacing scale, not something that shifts if content height changes later. Two separate jobs: padding = edge distance, justify-content = child distribution.
+
+Global body/reset styles
+Almost skipped body-level styling entirely. Landed on: background color, base text color, Karla as default font family, base line-height, and margin:0 all live on body — plus a small reset above it (box-sizing: border-box globally, zeroed margin/padding on headings/p/ul) so browser defaults don't fight the spacing scale later.
+
+Section padding consistency
+Confirmed vertical padding (64px→128px) stays identical across every section — that's what creates the "room to room" rhythm. Horizontal padding on the section itself also stays constant (edge safety), but content width inside each section can vary — About gets a narrow 720px reading column, Gallery can go wider (~1100px) since it's image-based, not prose.
+
+About section
+Kept it dead simple — just an h2 and a paragraph, capped at 720px, centered as a wrapper but left-aligned inside it. Decided against centering the text itself: centered paragraphs are harder to scan since your eye has to hunt for each new line's start. Left-alignment also created a nice rhythm shift across the page — hero feels like signage (centered, symmetrical), About feels like a conversation (left-aligned, intimate).
+
+Two quiet bugs, same root cause
+Hit content: '↓' doing nothing — turns out content only works on ::before/::after, not regular elements. Fixed by putting the arrow directly in the HTML instead. Right after that, my anchor link wasn't scrolling anywhere — I'd made About a class instead of an id, and fragment links (#about) only match ids. Both bugs were "nothing looks broken, nothing happens either" — the sneakiest kind.
+
+Gallery — first real grid
+This was the first section needing actual structural thinking. Went with CSS Grid over Flexbox since Grid handles rows and columns as one system — used repeat(auto-fit, minmax(220px, 1fr)) so column count adjusts automatically to screen width, no breakpoints needed. Forced every item to a 1:1 aspect ratio with object-fit: cover so the grid stays visually calm even once real (differently-shaped) photos replace the placeholders. Used placehold.co for placeholder images instead of hunting for real photos — avoids copyright risk and let me match my own palette.
+
+Gallery bug — "it looks messy"
+Grid wasn't centered (forgot margin-inline: auto — max-width alone doesn't center anything), and images weren't filling their squares (object-fit: cover had nothing to "cover" into without width/height: 100% on the img). Fixed both, grid looked right immediately after.
+
+Contact section
+Landed on inline SVG icons over emoji or <img> — emoji can't be recolored and clash with the whole palette; <img>-based icons lose the ability to control color via CSS. Inline SVG with stroke="currentColor" lets my existing color variables control icon color directly. Structured each row as icon+label tightly grouped, then a bigger gap before the value — the value is the only actual tap target, styled in terracotta since that's the one accent color reserved for real calls-to-action.
+
+Hero background — the "flat and empty" fix
+Once all four sections were built and I stepped back to look at the whole page, the hero felt too plain — a lot of empty warm beige with just centered text. Rather than reaching for a background photo (which would've meant a generic stock pottery image, undercutting the whole "credible, real person" feeling), I went with a subtle radial-gradient instead — --color-surface fading into --color-background, centered right behind the text. I also tried layering a CSS-only grain texture (an SVG feTurbulence filter, no image file needed) on top of it, but decided the gradient alone did the job — simpler, same effect, no need to stack two tricks when one works.
+
+Future-state plan, logged not built
+Once Marwa sends real studio photos, the plan is: put a low-opacity real photo behind the hero text (not now, since a placeholder/stock photo would misrepresent her actual work). And once Hero has moved on to a real photo, the radial-gradient trick gets a second life — moved down to become About's background. Landed on this after a bit of back-and-forth: my instinct was "don't repeat the same visual trick twice," but the real distinction is a photo and a soft gradient don't actually read as the same thing, even though the CSS mechanism is similar — so reusing the technique there isn't a repeat, it's just reusing a tool for a different job.
+
+One more detail worth remembering
+Noticed on mobile that the hero's layout (h1+tagline tight at the top, scroll indicator pushed to the bottom via flex space-between) leaves a big empty gap in between — which, in hindsight, is exactly the space a future hero photo will slot into with zero layout changes needed. Nice bit of foresight from a decision made purely for spacing reasons early on.
+
+Where it stands
+All four sections — hero, about, gallery, contact — are built, styled, and reviewed. Clay Light identity is consistent throughout: Fraunces/Karla pairing, warm clay palette with terracotta as the single accent, 8px spacing rhythm, CSS Grid gallery, inline SVG contact icons. Two clear next steps queued for later: swap in Marwa's real photos (gallery + eventually hero), and revisit About's background once that happens.
+
+Accessibility/performance pass
+Went back through the finished site with production-readiness in mind, not just visual polish. Ran a Lighthouse audit as a baseline: 99 Performance, 95 Accessibility, 100 Best Practices, 91 SEO — already strong for a static single-page site.
+
+Added loading="lazy" to the gallery images, since they're below the fold and don't need to load on initial page view. Added :focus-visible outline styling on links (terracotta, not the default browser blue) so keyboard users get a real visible focus indicator without a mouse-click ring showing up. Kept underlines off .contact-value links at rest for the cleaner look, but brought them back on hover/focus so there's still a non-color signal that the text is clickable.
+
+Contrast bug
+Lighthouse flagged the three contact-value links for low color contrast — terracotta on cream was sitting around 3.9:1, just under the 4.5:1 AA threshold for normal-size text. Fixed by swapping to --color-primary-dark, a shade already in the palette (originally meant as a hover state), which cleared contrast comfortably while staying on-brand. Accessibility jumped to 100 after that one change.
+
+SEO — left as-is for now, since the remaining points are mostly meta-description/content-dependent and better addressed once real client copy and images are in.
