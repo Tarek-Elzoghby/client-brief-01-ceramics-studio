@@ -43,4 +43,4 @@ Other choices made with keyboard and screen reader use in mind: visible `:focus-
 
 ## Status
 
-Built and reviewed. Not yet deployed.
+Built, reviewed and deployed.
